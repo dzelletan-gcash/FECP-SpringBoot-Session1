@@ -1,4 +1,5 @@
 package org.zoo.simulation.buildings;
+
 /**
  * Represents an animal enclosure within the zoo simulation.
  * Enclosures are specialized buildings that house animals and provide
@@ -16,8 +17,10 @@ package org.zoo.simulation.buildings;
  * @author Group 14 - FECP5 1006 - Kayne Rodrigo
  * @version 1.0
  * @since 2025-07-11
+ * @see Building
+ * @see org.zoo.simulation.animals.Animal
+ * @see org.zoo.simulation.people.Handler
  */
-
 public class Enclosure implements Building {
 
     /**
@@ -36,12 +39,11 @@ public class Enclosure implements Building {
      * @throws IllegalArgumentException if name is null or empty
      */
     public Enclosure(String name) {
-        if(name == null || name.trim().isEmpty()) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Enclosure name cannot be null or empty");
         }
         this.name = name;
     }
-
 
     /**
      * Returns the name of this enclosure.

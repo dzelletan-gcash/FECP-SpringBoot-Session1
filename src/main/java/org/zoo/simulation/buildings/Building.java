@@ -13,6 +13,7 @@ package org.zoo.simulation.buildings;
  * @since 2025-07-11
  */
 public interface Building {
+
     /**
      * Returns the name of this building.
      *
@@ -22,6 +23,8 @@ public interface Building {
      * tracking of people and animals.</p>
      *
      * @return the name of the building as a non-null String
+     * @see org.zoo.simulation.people.People#goTo(Building)
+     * @see org.zoo.simulation.animals.Animal#setLocation(Building)
      */
     String getName();
 }

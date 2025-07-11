@@ -1,4 +1,5 @@
 package org.zoo.simulation.buildings;
+
 /**
  * Represents the veterinary hospital within the zoo simulation.
  * The hospital is a specialized medical facility where sick or injured
@@ -18,17 +19,16 @@ package org.zoo.simulation.buildings;
  * @version 1.0
  * @since 2025-07-11
  * @see Building
-* * @see org.zoo.simulation.people.Veterinarian
- * * @see org.zoo.simulation.animals.Animal
+ * @see org.zoo.simulation.people.Veterinarian
+ * @see org.zoo.simulation.animals.Animal
  */
-
 public class Hospital implements Building {
+
     /**
      * The name of this hospital.
      * This field is immutable once set during construction.
      */
     private final String name;
-
 
     /**
      * Constructs a new hospital with the specified name.

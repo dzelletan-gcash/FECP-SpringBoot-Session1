@@ -1,6 +1,5 @@
 package org.zoo.simulation.buildings;
 
-
 /**
  * Represents a retail shop within the zoo simulation.
  * Shops are commercial buildings where visitors can purchase various
@@ -15,14 +14,13 @@ package org.zoo.simulation.buildings;
  * and generate revenue for zoo operations. They serve as interaction
  * points where visitors can make purchases and receive customer service.</p>
  *
- * @author Group 14 - FECP5 1006
+ * @author Group 14 - FECP5 1006 - Kayne Rodrigo
  * @version 1.0
  * @since 2025-07-11
  * @see Building
- * * @see org.zoo.simulation.people.Vendor
- * * @see org.zoo.simulation.people.Visitor
+ * @see org.zoo.simulation.people.Vendor
+ * @see org.zoo.simulation.people.Visitor
  */
-
 public class Shop implements Building {
 
     /**
@@ -61,4 +59,3 @@ public class Shop implements Building {
         return name;
     }
 }
-

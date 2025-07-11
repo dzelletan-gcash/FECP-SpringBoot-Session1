@@ -1,4 +1,14 @@
 package org.zoo.simulation.animals.types;
 
-public class Lion {
+import org.zoo.simulation.animals.species.Feline;
+
+public class Lion extends Feline {
+    public Lion() {
+        super("Lion");
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(getName() + " says: Grrr!");
+    }
 }

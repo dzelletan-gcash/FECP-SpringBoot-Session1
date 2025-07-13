@@ -14,27 +14,30 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         Zoo zoo = new Zoo(); // Create one instance of the Zoo
 
-        // This main loop follows the flowchart
+        // --- PROGRAM START ---
+        // 1. Immediately start with the Administrator Module as requested.
+        System.out.println("--- Zoo Simulation Initializing: Administrator Access Required ---");
+        runAdminModule(scanner, zoo);
+
+        // 2. After the admin is done, the main public-facing loop begins.
+        System.out.println("\n--- Administrator session ended. Entering public access mode. ---");
         while (true) {
-            System.out.println("\n=== Welcome to the Zoo Simulation ===");
-            System.out.println("1. Administrator Module");
-            System.out.println("2. Handler Module");
-            System.out.println("3. Visitor Module");
-            System.out.println("4. Exit");
+            System.out.println("\n=== Zoo Main Entrance ===");
+            System.out.println("1. Handler Module");
+            System.out.println("2. Visitor Module");
+            System.out.println("3. Exit Simulation");
             System.out.print("Choose an option: ");
             String choice = scanner.nextLine();
 
             switch (choice) {
-                case "1": runAdminModule(scanner, zoo); break;
-                case "2": runHandlerModule(scanner, zoo); break;
-                case "3": runVisitorModule(scanner, zoo); break;
-                case "4": System.out.println("Exiting simulation. Goodbye!"); return;
+                case "1": runHandlerModule(scanner, zoo); break;
+                case "2": runVisitorModule(scanner, zoo); break;
+                case "3": System.out.println("Exiting simulation. Goodbye!"); return;
                 default: System.out.println("Invalid option.");
             }
         }
     }
 
-    // Corresponds to the "Admin Module" box in the flowchart
     private static void runAdminModule(Scanner scanner, Zoo zoo) {
         System.out.println("\n=== Welcome to the Zoo Admin Console ===");
         System.out.print("Enter username: ");
@@ -46,7 +49,7 @@ public class Main {
             System.out.println("Login successful. Welcome!\n");
             adminMenu(scanner, zoo);
         } else {
-            System.out.println("Login failed.");
+            System.out.println("Login failed. Exiting admin setup.");
         }
     }
 
@@ -54,32 +57,34 @@ public class Main {
         while (true) {
             System.out.println("========== 🦁 ZOO ADMIN MAIN MENU ==========");
             System.out.println("1. Setup Zoo Staff");
-            System.out.println("2. Open Zoo to Visitors");
-            System.out.println("3. Close Zoo to Visitors");
-            System.out.println("4. Exit");
+            System.out.println("2. Access Handler Module");
+            System.out.println("3. Open Zoo to Visitors");
+            System.out.println("4. Close Zoo to Visitors");
+            System.out.println("5. Exit Admin Module");
             System.out.print("Choose an option: ");
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1":
-                    // This now calls the interactive setup method
                     setupStaff(scanner, zoo);
                     break;
                 case "2":
-                    zoo.openZoo();
+                    runHandlerModule(scanner, zoo);
                     break;
                 case "3":
-                    zoo.closeZoo();
+                    zoo.openZoo();
                     break;
                 case "4":
-                    return;
+                    zoo.closeZoo();
+                    break;
+                case "5":
+                    return; // Exits the admin menu and proceeds to the public-facing loop
                 default:
                     System.out.println("Invalid choice.");
             }
         }
     }
 
-    // NEW: Fully interactive staff setup method
     private static void setupStaff(Scanner scanner, Zoo zoo) {
         System.out.println("\n--- Zoo Setup ---");
 
@@ -113,7 +118,6 @@ public class Main {
         System.out.println("Zoo staff and animals setup complete.\n");
     }
 
-    // Implements the "Handler Module" from the screenshots and flowchart
     private static void runHandlerModule(Scanner scanner, Zoo zoo) {
         System.out.print("\nEnter your name (Handler): ");
         String name = scanner.nextLine();
@@ -129,7 +133,10 @@ public class Main {
         while (true) {
             System.out.println("\n--- Animal Duty Menu ---");
             System.out.println("Animals in the zoo:");
-            // List animals from the Zoo object for interaction
+            if (zoo.getAnimals().isEmpty()) {
+                System.out.println("No animals have been set up in the zoo yet.");
+                break;
+            }
             for (int i = 0; i < zoo.getAnimals().size(); i++) {
                 System.out.println((i + 1) + ". " + zoo.getAnimals().get(i).getName());
             }
@@ -137,6 +144,11 @@ public class Main {
             int animalChoice_idx = Integer.parseInt(scanner.nextLine());
 
             if (animalChoice_idx == 0) break;
+
+            if (animalChoice_idx < 1 || animalChoice_idx > zoo.getAnimals().size()) {
+                System.out.println("Invalid animal number.");
+                continue;
+            }
 
             Animal selectedAnimal = zoo.getAnimals().get(animalChoice_idx - 1);
 
@@ -164,7 +176,6 @@ public class Main {
         System.out.println("Finished duties for the day.");
     }
 
-    // Corresponds to the "Ticketing Module" and "Zoo Module" in the flowchart
     private static void runVisitorModule(Scanner scanner, Zoo zoo) {
         if (!zoo.isSetupAndOpen()) {
             System.out.println("Sorry, the zoo is not open to visitors yet. Please check back later.");
@@ -176,7 +187,10 @@ public class Main {
         String choice = scanner.nextLine();
 
         if ("no".equalsIgnoreCase(choice)) {
-            buyTicket(scanner, zoo);
+            if (!buyTicket(scanner, zoo)) {
+                System.out.println("Ticket purchase cancelled. Returning to main entrance.");
+                return;
+            }
         }
 
         System.out.println("\n=== Visitor Entry ===");
@@ -192,8 +206,13 @@ public class Main {
         }
     }
 
-    private static void buyTicket(Scanner scanner, Zoo zoo) {
+    private static boolean buyTicket(Scanner scanner, Zoo zoo) {
         System.out.println("\n=== 🎟️ WELCOME TO THE ZOO TICKET SHOP ===");
+        System.out.println("Here's what you can experience in the zoo:\n" +
+                "Visit Animal Enclosures (Elephant, Lion, Owl)\n" +
+                "Buy snacks and drinks from our Shops\n" +
+                "Listen to science lectures at the Hospital\n" +
+                "Buy fun gifts at our Gift Shop");
         System.out.print("Enter your name: ");
         String name = scanner.nextLine();
         System.out.print("Enter your age: ");
@@ -215,6 +234,10 @@ public class Main {
             zoo.addVisitor(newVisitor);
             System.out.println("Ticket purchased!");
             System.out.println("Your ticket code is: " + newVisitor.getTicketCode());
+            System.out.println("[Ticket added to system]");
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -230,12 +253,10 @@ public class Main {
 
             switch (choice) {
                 case "1":
-                    // This logic would be expanded to show specific enclosures
-                    System.out.println("You enjoy watching the animals in their enclosures.");
+                    visitEnclosure(scanner, zoo);
                     break;
                 case "2":
-                    // This logic would be expanded to allow purchasing items
-                    System.out.println("You browse the gift shop.");
+                    visitShop(scanner, zoo);
                     break;
                 case "3":
                     visitHospital(scanner, zoo);
@@ -247,45 +268,154 @@ public class Main {
         }
     }
 
-    private static void visitHospital(Scanner scanner, Zoo zoo) {
-        System.out.println("\n=== 🏥 Zoo Visitor Hospital Monitor ===");
-        System.out.println("1. View Sick Animals");
-        System.out.println("2. View Healed Animals");
-        System.out.println("3. Attend Science Lecture");
-        System.out.println("4. Heal Animals (Veterinarian)");
-        System.out.println("5. Exit");
+    private static void visitEnclosure(Scanner scanner, Zoo zoo) {
+        System.out.println("\n===Zoo Enclosure===");
+        System.out.println("1. Pachyderm (Elephant)");
+        System.out.println("2. Feline (Lion)");
+        System.out.println("3. Bird (Owl)");
         System.out.print("Choose an option: ");
         String choice = scanner.nextLine();
 
+        Animal animalToInteract = null;
+        Class<? extends Animal> animalType = null;
+
+        // Determine which type of animal to look for based on the user's choice
         switch (choice) {
             case "1":
-                System.out.println("Sick Animals Currently in Hospital:");
-                if(zoo.getSickAnimals().isEmpty()) {
-                    System.out.println("None at the moment.");
-                } else {
-                    for (Animal animal : zoo.getSickAnimals()) {
-                        System.out.println("- " + animal.getName());
-                    }
-                }
+                animalType = Elephant.class;
                 break;
             case "2":
-                System.out.println("Healed Animals with Timestamps:");
-                if(zoo.getHealedAnimalLog().isEmpty()) {
-                    System.out.println("None yet today.");
-                } else {
-                    for (String log : zoo.getHealedAnimalLog()) {
-                        System.out.println(log);
-                    }
-                }
+                animalType = Lion.class;
                 break;
             case "3":
-                zoo.getVeterinarian().lecture();
+                animalType = Owl.class;
                 break;
-            case "4":
-                zoo.healAllSickAnimals();
+            default:
+                System.out.println("Invalid enclosure choice.");
+                return;
+        }
+
+        // Find the first animal of the chosen type in the zoo
+        for (Animal animal : zoo.getAnimals()) {
+            if (animalType.isInstance(animal)) {
+                animalToInteract = animal;
                 break;
-            case "5":
-                System.out.println("Exiting Zoo Vet Hospital. Goodbye!");
+            }
+        }
+
+        // If an animal was found, start the interaction
+        if (animalToInteract != null) {
+            System.out.print("Would you like to feed " + animalToInteract.getName() + "? (yes/no) ");
+            if ("yes".equalsIgnoreCase(scanner.nextLine())) {
+                animalToInteract.eat();       // Animal performs its eat action
+                animalToInteract.makeSound(); // Animal performs its unique sound
+            }
+        } else {
+            // If no animal of that type was found in the zoo setup
+            System.out.println("There are no animals of that type in the enclosure at the moment.");
+        }
+    }
+
+    private static void visitShop(Scanner scanner, Zoo zoo) {
+        System.out.println("\n=== 🛒 Zoo Shop ===");
+        System.out.println("Available Products:");
+
+        // A LinkedHashMap maintains the order of insertion, which is perfect for a menu.
+        java.util.Map<String, Double> products = new java.util.LinkedHashMap<>();
+        products.put("Soft Drink", 30.00);
+        products.put("Popcorn", 50.00);
+        products.put("Plush Toy", 120.00);
+        products.put("Keychain", 45.00);
+
+        // To display a numbered list, we can convert the keys (product names) to a list.
+        java.util.List<String> productNames = new java.util.ArrayList<>(products.keySet());
+
+        // Display the products to the user
+        for (int i = 0; i < productNames.size(); i++) {
+            String name = productNames.get(i);
+            double price = products.get(name); // Get the price from the map using the name as the key
+            System.out.printf("%d. %s - P%.2f\n", i + 1, name, price);
+        }
+
+        System.out.print("Enter the number of the item you want to buy: ");
+        String choiceStr = scanner.nextLine();
+
+        try {
+            int choice = Integer.parseInt(choiceStr);
+            if (choice >= 1 && choice <= productNames.size()) {
+                // Get the name from our ordered list
+                String selectedName = productNames.get(choice - 1);
+                // Get the price from the map using that name
+                double selectedPrice = products.get(selectedName);
+
+                System.out.println("Selected:");
+                System.out.printf("%s (P%.2f)\n", selectedName, selectedPrice);
+                System.out.printf("Total: P%.2f\n", selectedPrice);
+                System.out.print("Proceed to checkout? (yes/no) ");
+
+                if ("yes".equalsIgnoreCase(scanner.nextLine())) {
+                    System.out.println("Payment successful!");
+                    System.out.println("Receipt:");
+                    System.out.printf("- %s: P%.2f\n", selectedName, selectedPrice);
+                    System.out.printf("Total Paid: P%.2f\n", selectedPrice);
+                }
+            } else {
+                System.out.println("Invalid selection. Please choose a number from the list.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+    }
+
+    private static void visitHospital(Scanner scanner, Zoo zoo) {
+        while (true) {
+            System.out.println("\n=== 🏥 Zoo Visitor Hospital Monitor ===");
+            System.out.println("1. View Sick Animals");
+            System.out.println("2. View Healed Animals");
+            System.out.println("3. Attend Science Lecture");
+            System.out.println("4. Heal Animals (Veterinarian)");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    System.out.println("Sick Animals Currently in Hospital:");
+                    if (zoo.getSickAnimals().isEmpty()) {
+                        System.out.println("None at the moment.");
+                    } else {
+                        for (Animal animal : zoo.getSickAnimals()) {
+                            System.out.println("- " + animal.getName());
+                        }
+                    }
+                    break;
+                case "2":
+                    System.out.println("Healed Animals with Timestamps:");
+                    if (zoo.getHealedAnimalLog().isEmpty()) {
+                        System.out.println("None yet today.");
+                    } else {
+                        for (String log : zoo.getHealedAnimalLog()) {
+                            System.out.println(log);
+                        }
+                    }
+                    break;
+                case "3":
+                    if (zoo.getVeterinarian() != null) {
+                        zoo.getVeterinarian().lecture();
+                    } else {
+                        System.out.println("The Veterinarian has not been set up yet.");
+                    }
+                    break;
+                case "4":
+                    zoo.healAllSickAnimals();
+                    break;
+                case "5":
+                    System.out.println("Exiting Zoo Vet Hospital. Goodbye!");
+                    return; // This exits the method and returns to the zooVisitorMenu
+                default:
+                    System.out.println("Invalid option. Please try again.");
+                    break;
+            }
         }
     }
 }

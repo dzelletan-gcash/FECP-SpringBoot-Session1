@@ -45,7 +45,7 @@ public class Main {
         System.out.print("Enter password: ");
         String pass = scanner.nextLine();
 
-        if ("admin".equals(user) && "adminadmin".equals(pass)) {
+        if ("admin".equals(user) && "admin123".equals(pass)) {
             System.out.println("Login successful. Welcome!\n");
             adminMenu(scanner, zoo);
         } else {

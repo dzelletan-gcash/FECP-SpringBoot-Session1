@@ -25,7 +25,7 @@ public class Zoo {
     private final List<String> healedAnimalLog = new ArrayList<>();
 
     public Zoo() {
-        // The constructor is now empty; setup is fully interactive
+        // The constructor is empty; setup is fully interactive
     }
 
     // --- Methods to SET staff ---
@@ -37,6 +37,12 @@ public class Zoo {
 
 
     // --- Methods to GET staff and state ---
+
+    // NEW METHOD: Returns the entire map of handlers and their roles.
+    public Map<String, Handler> getHandlers() {
+        return this.handlers;
+    }
+
     public Handler getHandler(String name) {
         // Find handler by name instead of role for the handler module
         for(Handler handler : handlers.values()) {
@@ -53,7 +59,7 @@ public class Zoo {
     public List<String> getHealedAnimalLog() { return healedAnimalLog; }
 
 
-    // --- Methods to manage Zoo state, matching the flowchart ---
+    // --- Methods to manage Zoo state ---
     public void openZoo() {
         if (manager == null) {
             System.out.println("Cannot open the zoo. Please set up the Manager first.");

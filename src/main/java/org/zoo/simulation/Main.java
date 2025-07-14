@@ -8,19 +8,36 @@ import org.zoo.simulation.people.*;
 
 import java.util.Scanner;
 
+/**
+ * Main class for the Zoo Simulation application.
+ * This class serves as the entry point and primary controller for the simulation,
+ * managing user interactions through a console-based menu system. It directs
+ * users to different modules such as Administrator, Handler, and Visitor.
+ */
 public class Main {
 
+    /**
+     * The main entry point for the Zoo Simulation.
+     * Initializes the simulation, creates a single Zoo instance, and presents the
+     * main menu to switch between different user roles.
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Zoo zoo = new Zoo(); // Create one instance of the Zoo
 
-        // --- PROGRAM START ---
-        // 1. Immediately start with the Administrator Module as requested.
         System.out.println("--- Zoo Simulation Initializing: Administrator Access Required ---");
+        System.out.println("  __________             ");
+        System.out.println("  \\____    /____   ____  ");
+        System.out.println("    /     //  _ \\ /  _ \\ ");
+        System.out.println("   /     /(  <_> |  <_> )");
+        System.out.println("  /_______ \\____/ \\____/ ");
+        System.out.println("          \\/              ");
         runAdminModule(scanner, zoo);
 
-        // 2. After the admin is done, the main public-facing loop begins.
         System.out.println("\n--- Administrator session ended. Entering public access mode. ---");
+        // Main simulation loop for public access (Handlers and Visitors).
         while (true) {
             System.out.println("\n=== Zoo Main Entrance ===");
             System.out.println("1. Handler Module");
@@ -38,6 +55,14 @@ public class Main {
         }
     }
 
+    /**
+     * Runs the administrator module.
+     * This method handles the login process for the administrator. If authentication
+     * is successful, it proceeds to the main admin menu.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void runAdminModule(Scanner scanner, Zoo zoo) {
         System.out.println("\n=== Welcome to the Zoo Admin Console ===");
         System.out.print("Enter username: ");
@@ -53,6 +78,14 @@ public class Main {
         }
     }
 
+    /**
+     * Displays the main menu for administrators.
+     * Allows the admin to set up staff, access handler functions, open or close the zoo,
+     * or exit the admin module.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void adminMenu(Scanner scanner, Zoo zoo) {
         while (true) {
             System.out.println("========== 🦁 ZOO ADMIN MAIN MENU ==========");
@@ -85,6 +118,14 @@ public class Main {
         }
     }
 
+    /**
+     * Guides the administrator through the process of setting up zoo personnel and animals.
+     * This includes creating a Manager, Veterinarian, various Handlers, and Vendors,
+     * and adding initial animals to the zoo.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void setupStaff(Scanner scanner, Zoo zoo) {
         System.out.println("\n--- Zoo Setup ---");
 
@@ -118,10 +159,28 @@ public class Main {
         System.out.println("Zoo staff and animals setup complete.\n");
     }
 
+    /**
+     * Runs the animal handler module.
+     * Authenticates a handler by name and allows them to perform duties such as
+     * feeding, exercising, or admitting an animal to the hospital.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void runHandlerModule(Scanner scanner, Zoo zoo) {
         System.out.print("\nEnter your name (Handler): ");
         String name = scanner.nextLine();
-        Handler handler = zoo.getHandler(name);
+
+        // Find the handler and their specific role (e.g., "Feline Handler")
+        String handlerRole = null;
+        Handler handler = null;
+        for (java.util.Map.Entry<String, Handler> entry : zoo.getHandlers().entrySet()) {
+            if (entry.getValue().getName().equalsIgnoreCase(name)) {
+                handler = entry.getValue();
+                handlerRole = entry.getKey();
+                break;
+            }
+        }
 
         if (handler == null) {
             System.out.println("No handler found with that name.");
@@ -130,27 +189,56 @@ public class Main {
 
         System.out.println("Welcome, Handler " + name + "!");
 
+        // Create a new list containing only the animals assigned to this handler
+        java.util.List<Animal> assignedAnimals = new java.util.ArrayList<>();
+        if (handlerRole != null) {
+            switch (handlerRole) {
+                case "Feline Handler":
+                    for (Animal animal : zoo.getAnimals()) {
+                        if (animal instanceof org.zoo.simulation.animals.species.Feline) {
+                            assignedAnimals.add(animal);
+                        }
+                    }
+                    break;
+                case "Pachyderm Handler":
+                    for (Animal animal : zoo.getAnimals()) {
+                        if (animal instanceof org.zoo.simulation.animals.species.Pachyderm) {
+                            assignedAnimals.add(animal);
+                        }
+                    }
+                    break;
+                case "Bird Handler":
+                    for (Animal animal : zoo.getAnimals()) {
+                        if (animal instanceof org.zoo.simulation.animals.species.Bird) {
+                            assignedAnimals.add(animal);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        // The rest of the module now uses the filtered 'assignedAnimals' list
         while (true) {
             System.out.println("\n--- Animal Duty Menu ---");
-            System.out.println("Animals in the zoo:");
-            if (zoo.getAnimals().isEmpty()) {
-                System.out.println("No animals have been set up in the zoo yet.");
+            System.out.println("Animals assigned to you:");
+            if (assignedAnimals.isEmpty()) {
+                System.out.println("There are no animals of your type set up in the zoo.");
                 break;
             }
-            for (int i = 0; i < zoo.getAnimals().size(); i++) {
-                System.out.println((i + 1) + ". " + zoo.getAnimals().get(i).getName());
+            for (int i = 0; i < assignedAnimals.size(); i++) {
+                System.out.println((i + 1) + ". " + assignedAnimals.get(i).getName());
             }
             System.out.print("Choose animal number to interact with (0 to exit): ");
             int animalChoice_idx = Integer.parseInt(scanner.nextLine());
 
             if (animalChoice_idx == 0) break;
 
-            if (animalChoice_idx < 1 || animalChoice_idx > zoo.getAnimals().size()) {
+            if (animalChoice_idx < 1 || animalChoice_idx > assignedAnimals.size()) {
                 System.out.println("Invalid animal number.");
                 continue;
             }
 
-            Animal selectedAnimal = zoo.getAnimals().get(animalChoice_idx - 1);
+            Animal selectedAnimal = assignedAnimals.get(animalChoice_idx - 1);
 
             System.out.println("\nChoose action:");
             System.out.println("1. Feed " + selectedAnimal.getName());
@@ -176,6 +264,15 @@ public class Main {
         System.out.println("Finished duties for the day.");
     }
 
+    /**
+     * Runs the visitor module.
+     * Checks if the zoo is open. If so, it prompts the visitor for a ticket.
+     * If they don't have one, it offers the option to buy one. Validated visitors
+     * are then taken to the main visitor menu.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void runVisitorModule(Scanner scanner, Zoo zoo) {
         if (!zoo.isSetupAndOpen()) {
             System.out.println("Sorry, the zoo is not open to visitors yet. Please check back later.");
@@ -206,6 +303,15 @@ public class Main {
         }
     }
 
+    /**
+     * Manages the ticket purchasing process for a visitor.
+     * Calculates the ticket price based on age, confirms the purchase,
+     * and if successful, creates a new Visitor and adds them to the zoo's system.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     * @return {@code true} if the ticket was successfully purchased, {@code false} otherwise.
+     */
     private static boolean buyTicket(Scanner scanner, Zoo zoo) {
         System.out.println("\n=== 🎟️ WELCOME TO THE ZOO TICKET SHOP ===");
         System.out.println("Here's what you can experience in the zoo:\n" +
@@ -241,6 +347,14 @@ public class Main {
         }
     }
 
+    /**
+     * Displays the main menu for a visitor who is inside the zoo.
+     * Allows the visitor to navigate to different areas like enclosures, the shop,
+     * or the hospital, or to leave the zoo.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void zooVisitorMenu(Scanner scanner, Zoo zoo) {
         while (true) {
             System.out.println("\nWhat would you like to do?");
@@ -268,6 +382,14 @@ public class Main {
         }
     }
 
+    /**
+     * Manages a visitor's interaction with an animal enclosure.
+     * The visitor chooses an enclosure type, and the system finds an animal of that
+     * type for interaction (e.g., feeding).
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void visitEnclosure(Scanner scanner, Zoo zoo) {
         System.out.println("\n===Zoo Enclosure===");
         System.out.println("1. Pachyderm (Elephant)");
@@ -316,18 +438,24 @@ public class Main {
         }
     }
 
+    /**
+     * Simulates a visitor visiting the zoo shop.
+     * Displays a list of products and allows the visitor to select an item,
+     * view the price, and complete a mock purchase.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void visitShop(Scanner scanner, Zoo zoo) {
         System.out.println("\n=== 🛒 Zoo Shop ===");
         System.out.println("Available Products:");
 
-        // A LinkedHashMap maintains the order of insertion, which is perfect for a menu.
         java.util.Map<String, Double> products = new java.util.LinkedHashMap<>();
         products.put("Soft Drink", 30.00);
         products.put("Popcorn", 50.00);
         products.put("Plush Toy", 120.00);
         products.put("Keychain", 45.00);
 
-        // To display a numbered list, we can convert the keys (product names) to a list.
         java.util.List<String> productNames = new java.util.ArrayList<>(products.keySet());
 
         // Display the products to the user
@@ -367,6 +495,15 @@ public class Main {
         }
     }
 
+    /**
+     * Manages a visitor's interaction with the zoo hospital.
+     * Allows visitors to view lists of sick and healed animals, attend a science lecture
+     * by the veterinarian, or exit. Also includes a veterinarian-specific function
+     * to heal animals.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @param zoo The main Zoo instance.
+     */
     private static void visitHospital(Scanner scanner, Zoo zoo) {
         while (true) {
             System.out.println("\n=== 🏥 Zoo Visitor Hospital Monitor ===");
